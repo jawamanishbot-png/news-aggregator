@@ -7,6 +7,12 @@ import './App.css'
 
 const API_KEY = import.meta.env.VITE_NEWS_API_KEY || ''
 
+console.log('🔑 API Key Status:', {
+  keyExists: !!API_KEY,
+  keyLength: API_KEY?.length || 0,
+  keyStart: API_KEY?.substring(0, 5) + '...' || 'MISSING',
+})
+
 export default function App() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(false)
@@ -18,8 +24,11 @@ export default function App() {
   const CATEGORIES = ['general', 'business', 'entertainment', 'health', 'science', 'sports', 'technology']
 
   const fetchNews = async (query = searchQuery, category = selectedCategory) => {
+    console.log('📡 fetchNews called:', { query, category, sortBy })
+
     if (!API_KEY) {
-      setError('Please add VITE_NEWS_API_KEY to .env file')
+      console.error('❌ API_KEY is missing!')
+      setError('Please add VITE_NEWS_API_KEY to environment variables')
       return
     }
 
@@ -31,11 +40,18 @@ export default function App() {
         ? `https://newsapi.org/v2/everything?q=${query}&apiKey=${API_KEY}&sortBy=${sortBy}`
         : `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${API_KEY}&sortBy=${sortBy}`
 
+      console.log('🚀 Making API request to:', endpoint.split('apiKey=')[0] + 'apiKey=***')
       const response = await axios.get(endpoint)
+      console.log('✅ API Success:', { articlesCount: response.data.articles?.length || 0 })
       setArticles(response.data.articles || [])
     } catch (err) {
-      setError('Failed to fetch news. Check API key or try again.')
-      console.error(err)
+      console.error('❌ API Error:', {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+      })
+      setError(`Failed to fetch news: ${err.response?.data?.message || err.message}`)
     } finally {
       setLoading(false)
     }
