@@ -51,7 +51,8 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetchNews()
+    // Don't fetch on load - let user manually trigger search
+    console.log('✅ App initialized - ready for search')
   }, [])
 
   const handleSearch = (query) => {
