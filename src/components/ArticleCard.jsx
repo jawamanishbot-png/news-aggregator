@@ -1,7 +1,10 @@
 import './ArticleCard.css'
 
 export default function ArticleCard({ article }) {
-  const { title, description, image, url, source, publishedAt } = article
+  // NewsAPI returns urlToImage, not image
+  // and source as object { id, name }
+  const { title, description, urlToImage, url, source, publishedAt } = article
+  const sourceName = typeof source === 'string' ? source : source?.name
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -13,12 +16,12 @@ export default function ArticleCard({ article }) {
 
   return (
     <article className="article-card">
-      {image && <img src={image} alt={title} className="article-image" onError={(e) => e.target.style.display = 'none'} />}
+      {urlToImage && <img src={urlToImage} alt={title} className="article-image" onError={(e) => e.target.style.display = 'none'} />}
       <div className="article-content">
         <h2 className="article-title">{title}</h2>
         <p className="article-description">{description}</p>
         <div className="article-meta">
-          <span className="source">{source}</span>
+          <span className="source">{sourceName || 'Unknown'}</span>
           <span className="date">{formatDate(publishedAt)}</span>
         </div>
         <a href={url} target="_blank" rel="noopener noreferrer" className="read-more">
