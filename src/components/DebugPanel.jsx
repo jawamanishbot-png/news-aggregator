@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './DebugPanel.css'
 
 export default function DebugPanel({ error, articles, loading }) {
-  const [showDebug, setShowDebug] = useState(false)
+  const [showDebug, setShowDebug] = useState(true)
   const [apiResponse, setApiResponse] = useState(null)
   const [testLoading, setTestLoading] = useState(false)
 
