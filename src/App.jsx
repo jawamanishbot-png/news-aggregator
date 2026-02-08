@@ -5,13 +5,8 @@ import SearchBar from './components/SearchBar'
 import CategoryFilter from './components/CategoryFilter'
 import './App.css'
 
-const API_KEY = import.meta.env.VITE_NEWS_API_KEY || ''
-
-console.log('🔑 API Key Status:', {
-  keyExists: !!API_KEY,
-  keyLength: API_KEY?.length || 0,
-  keyStart: API_KEY?.substring(0, 5) + '...' || 'MISSING',
-})
+// API key is now server-side only (in backend API route)
+console.log('✅ App initialized - API calls will go through backend proxy')
 
 export default function App() {
   const [articles, setArticles] = useState([])
@@ -26,22 +21,19 @@ export default function App() {
   const fetchNews = async (query = searchQuery, category = selectedCategory) => {
     console.log('📡 fetchNews called:', { query, category, sortBy })
 
-    if (!API_KEY) {
-      console.error('❌ API_KEY is missing!')
-      setError('Please add VITE_NEWS_API_KEY to environment variables')
-      return
-    }
-
     setLoading(true)
     setError(null)
 
     try {
-      const endpoint = query
-        ? `https://newsapi.org/v2/everything?q=${query}&apiKey=${API_KEY}&sortBy=${sortBy}`
-        : `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${API_KEY}&sortBy=${sortBy}`
+      // Call our backend API endpoint (which calls NewsAPI)
+      const apiUrl = '/api/news'
+      const params = new URLSearchParams({
+        ...(query ? { query } : { category }),
+        sortBy,
+      })
 
-      console.log('🚀 Making API request to:', endpoint.split('apiKey=')[0] + 'apiKey=***')
-      const response = await axios.get(endpoint)
+      console.log('🚀 Making request to backend:', `${apiUrl}?${params}`)
+      const response = await axios.get(`${apiUrl}?${params}`)
       console.log('✅ API Success:', { articlesCount: response.data.articles?.length || 0 })
       setArticles(response.data.articles || [])
     } catch (err) {
@@ -51,7 +43,7 @@ export default function App() {
         statusText: err.response?.statusText,
         data: err.response?.data,
       })
-      setError(`Failed to fetch news: ${err.response?.data?.message || err.message}`)
+      setError(`Failed to fetch news: ${err.response?.data?.error || err.message}`)
     } finally {
       setLoading(false)
     }
