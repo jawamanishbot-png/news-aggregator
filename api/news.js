@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_KEY = process.env.VITE_NEWS_API_KEY
+const API_KEY = process.env.NEWS_API_KEY
 
 export default async function handler(req, res) {
   // Enable CORS
