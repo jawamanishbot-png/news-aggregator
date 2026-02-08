@@ -3,6 +3,7 @@ import axios from 'axios'
 import NewsFeed from './components/NewsFeed'
 import SearchBar from './components/SearchBar'
 import CategoryFilter from './components/CategoryFilter'
+import DebugPanel from './components/DebugPanel'
 import './App.css'
 
 // API key is now server-side only (in backend API route)
@@ -96,6 +97,8 @@ export default function App() {
       {loading && <div className="loading">Loading news...</div>}
 
       <NewsFeed articles={articles} />
+
+      <DebugPanel error={error} articles={articles} loading={loading} />
     </div>
   )
 }
